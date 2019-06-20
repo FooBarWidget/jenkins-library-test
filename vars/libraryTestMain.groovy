@@ -1,14 +1,25 @@
-def call(block) {
+def call(options) {
     pipeline {
-        agent 'any'
+        agent any
+        // Stages are pre-defined, but within a step you can call arbitrary code.
         stages {
             stage('Stage 1') {
                 steps {
-                    echo "Hello world"
+                    script {
+                        echo "Hello world"
+                        if (options.containsKey('stage_1_block')) {
+                            options['stage_1_block']()
+                        }
+                    }
                 }
-            }
-            if (block != null) {
-                block()
+                post {
+                    script {
+                        echo "Hello world post"
+                        if (options.containsKey('stage_1_post_block')) {
+                            options['stage_1_post_block']()
+                        }
+                    }
+                }
             }
         }
     }
