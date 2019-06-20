@@ -12,13 +12,15 @@ def call(options) {
                         }
                     }
                 }
-                post {
-                    script {
-                        echo "Hello world post"
-                        if (options.containsKey('stage_1_post_block')) {
-                            options['stage_1_post_block']()
-                        }
-                    }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                echo "Hello world post"
+                if (options.containsKey('post_always_block')) {
+                    options['post_always_block']()
                 }
             }
         }
