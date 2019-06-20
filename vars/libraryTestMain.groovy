@@ -14,13 +14,13 @@ def call(options) {
                 }
             }
         }
-    }
-    post {
-        always {
-            script {
-                echo "Hello world post"
-                if (options.containsKey('post_always_block')) {
-                    options['post_always_block']()
+        post {
+            always {
+                script {
+                    echo "Hello world post"
+                    if (options.containsKey('post_always_block')) {
+                        options['post_always_block']()
+                    }
                 }
             }
         }
