@@ -1,3 +1,5 @@
+import org.Helper
+
 METADATA_FILE_BASE_NAME = 'metadata.rb'
 HELPER = null
 BUMPED_VERSION = null
@@ -22,7 +24,7 @@ def call(options) {
             stage('Preparation') {
                 steps {
                     script {
-                        HELPER = load 'src/org/Helper.groovy'
+                        HELPER = new org.Helper()
                         echo "Current commit: ${env.GIT_COMMIT}"
                         echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 
