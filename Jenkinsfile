@@ -71,7 +71,7 @@ def calcVersionBumpMatrixFromChangeset() {
 }
 
 def parseVersionString(versionFile, version) {
-	def parts = version.split(".")
+	def parts = version.split("\\.")
 	if (parts.length != 3) {
 		error("Error parsing version number '$version' in file '$versionFile':"
 			+ " it does not consist of exactly 3 parts.")
@@ -81,6 +81,11 @@ def parseVersionString(versionFile, version) {
 		parts[1] as int,
 		parts[2] as int
 	] as int[]
+}
+
+def getBranchName() {
+	def parts = env.GIT_BRANCH.split("/", 2)
+	return parts[1]
 }
 
 @NonCPS
@@ -96,7 +101,7 @@ pipeline {
 			steps {
 				script {
 					sh 'env | sort'
-					if (env.GIT_BRANCH == 'master') {
+					if (getBranchName() == 'master') {
 						def version = readVersion()
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "version = ${version}"
