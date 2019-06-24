@@ -1,24 +1,7 @@
-def commitHashForBuild(build) {
-	def scmAction = build?.actions.find { action -> action instanceof jenkins.scm.api.SCMRevisionAction }
-	return scmAction?.revision?.hash
-}
-
-@NonCPS
-def getLastSuccessfulCommit() {
-	def lastSuccessfulHash = null
-	def lastSuccessfulBuild = currentBuild.rawBuild.getPreviousSuccessfulBuild()
-	if (lastSuccessfulBuild) {
-		lastSuccessfulHash = commitHashForBuild(lastSuccessfulBuild)
-	}
-	return lastSuccessfulHash
-}
-
 def forEachCommitSinceLastSuccessfulBuild(block) {
-	def lastSuccessfulCommit = getLastSuccessfulCommit()
-	def currentCommit = commitHashForBuild(currentBuild.rawBuild)
-	if (lastSuccessfulCommit) {
+	if (env.GIT_PREVIOUS_SUCCESSFUL_COMMIT != null) {
 		def commits = sh(
-			script: "git log --format='%H' '$lastSuccessfulCommit..$currentCommit'",
+			script: "git log --format='%H' '${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}..${env.GIT_COMMIT}'",
 			returnStdout: true
 		).split('\n')
 		for (commit in commits) {
@@ -103,6 +86,8 @@ pipeline {
 				script {
 					sh 'env | sort'
 					if (getBranchName() == 'master') {
+						echo "Current commit: ${env.GIT_COMMIT}\n"
+							+ "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 						def version = readVersion()
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "version = ${version}"
