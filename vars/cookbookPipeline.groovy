@@ -72,13 +72,13 @@ def call(options) {
                             }
                         }
 
-                        def tests = {
+                        def tests = [
                             foodcritic: {
                                 shRubyCommand 'foodcritic .'
                             }
-                        }
+                        ]
 
-                        /* if (fileExists('spec')) {
+                        if (fileExists('spec')) {
                             tests['rspec'] = {
                                 if (usesBundler) {
                                     sh 'bundle exec rspec -f d'
@@ -97,7 +97,7 @@ def call(options) {
                                     shRubyCommand 'kitchen destroy'
                                 }
                             }
-                        } */
+                        }
 
                         if (options.containsKey('tests')) {
                             tests += options['tests']
