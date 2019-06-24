@@ -86,8 +86,8 @@ pipeline {
 				script {
 					sh 'env | sort'
 					if (getBranchName() == 'master') {
-						echo "Current commit: ${env.GIT_COMMIT}\n"
-							+ "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+						echo "Current commit: ${env.GIT_COMMIT}"
+						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 						def version = readVersion()
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "version = ${version}"
