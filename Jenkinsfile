@@ -42,7 +42,7 @@ def boolean[] calcVersionBumpMatrixFromCommitMessage(message) {
 	} else {
 		sourceBranchMessage = message
 	}
-
+println("source branch message = $sourceBranchMessage")
 	if (sourceBranchMessage.matches(/(?m)^major\//)) {
 		return [true,  false, false] as boolean[]
 	} else if (sourceBranchMessage.matches(/(?m)^minor\//)) {
