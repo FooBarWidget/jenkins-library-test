@@ -61,48 +61,50 @@ def call(options) {
                 }
             }
             stage('Tests') {
-                script {
-                    def usesBundler = fileExists('Gemfile')
-                    def shRubyCommand = { command ->
-                        if (usesBundler) {
-                            sh "bundle exec ${command}"
-                        } else {
-                            sh command
-                        }
-                    }
-
-                    def tests = {
-                        foodcritic: {
-                            shRubyCommand 'foodcritic .'
-                        }
-                    }
-
-                    if (fileExists('spec')) {
-                        tests['rspec'] = {
+                steps {
+                    script {
+                        def usesBundler = fileExists('Gemfile')
+                        def shRubyCommand = { command ->
                             if (usesBundler) {
-                                sh 'bundle exec rspec -f d'
+                                sh "bundle exec ${command}"
                             } else {
-                                sh 'chef exec rspec -f d'
+                                sh command
                             }
                         }
-                    }
 
-                    if (fileExists('.kitchen.yml') || fileExists('kitchen.yml')) {
-                        tests['kitchen'] = {
-                            try {
-                                shRubyCommand 'kitchen converge'
-                                shRubyCommand 'kitchen verify'
-                            } finally {
-                                shRubyCommand 'kitchen destroy'
+                        def tests = {
+                            foodcritic: {
+                                shRubyCommand 'foodcritic .'
                             }
                         }
-                    }
 
-                    if (options.containsKey('tests')) {
-                        tests += options['tests']
-                    }
+                        if (fileExists('spec')) {
+                            tests['rspec'] = {
+                                if (usesBundler) {
+                                    sh 'bundle exec rspec -f d'
+                                } else {
+                                    sh 'chef exec rspec -f d'
+                                }
+                            }
+                        }
 
-                    parallel(tests)
+                        if (fileExists('.kitchen.yml') || fileExists('kitchen.yml')) {
+                            tests['kitchen'] = {
+                                try {
+                                    shRubyCommand 'kitchen converge'
+                                    shRubyCommand 'kitchen verify'
+                                } finally {
+                                    shRubyCommand 'kitchen destroy'
+                                }
+                            }
+                        }
+
+                        if (options.containsKey('tests')) {
+                            tests += options['tests']
+                        }
+
+                        parallel(tests)
+                    }
                 }
             }
         }
