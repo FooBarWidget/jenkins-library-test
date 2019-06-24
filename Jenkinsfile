@@ -1,3 +1,8 @@
+def getBranchName() {
+	def parts = env.GIT_BRANCH.split("/", 2)
+	return parts[1]
+}
+
 def forEachCommitSinceLastSuccessfulBuild(block) {
 	if (env.GIT_PREVIOUS_SUCCESSFUL_COMMIT != null) {
 		def commits = sh(
@@ -67,15 +72,24 @@ def parseVersionString(versionFile, version) {
 	] as int[]
 }
 
-def getBranchName() {
-	def parts = env.GIT_BRANCH.split("/", 2)
-	return parts[1]
-}
-
 @NonCPS
 def int[] readVersion() {
 	return parseVersionString("version.txt",
 		readFile("${env.WORKSPACE}/version.txt").trim())
+}
+
+def calculateBumpedVersion(version, versionBumpMatrix) {
+	def result = version.clone()
+	if (versionBumpMatrix[0]) {
+		result[0]++
+	}
+	if (versionBumpMatrix[1]) {
+		result[1]++
+	}
+	if (versionBumpMatrix[2]) {
+		result[2]++
+	}
+	return result
 }
 
 pipeline {
@@ -89,9 +103,11 @@ pipeline {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 						def version = readVersion()
-						echo "Detected version: ${version}"
+						echo "Detected current version: $version"
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
-						echo "Calculated version bump plan: ${versionBumpMatrix}"
+						echo "Calculated version bump plan: $versionBumpMatrix"
+						def bumpedVersion = calculateBumpedVersion(version, versionBumpMatrix)
+						echo "Will bump version to: $bumpedVersion"
 					}
 				}
 			}
