@@ -1,4 +1,4 @@
-def VERSION_FILE_BASE_NAME = "version.txt"
+VERSION_FILE_BASE_NAME = "version.txt"
 
 def getVersionFileFullPath() {
 	return "${env.WORKSPACE}/${VERSION_FILE_BASE_NAME}"
