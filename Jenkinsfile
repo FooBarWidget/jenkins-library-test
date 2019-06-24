@@ -68,7 +68,7 @@ def calcVersionBumpMatrixFromChangeset() {
 }
 
 def int[] parseVersionString(versionFile, version) {
-	def parts = version.split("\\.")
+	def parts = version.trim().split("\\.")
 	if (parts.length != 3) {
 		error("Error parsing version number '$version' in file '$versionFile':"
 			+ " it does not consist of exactly 3 parts.")
