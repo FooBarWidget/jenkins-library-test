@@ -81,7 +81,7 @@ def int[] parseVersionString(versionFile, version) {
 }
 
 @NonCPS
-def int[] readVersionString() {
+def String readVersionString() {
 	return readFile(getVersionFileFullPath())
 }
 
