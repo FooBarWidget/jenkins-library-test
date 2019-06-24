@@ -1,0 +1,50 @@
+HELPER = null
+BUMPED_VERSION = null
+BUMPED_MAJOR_VERSION = null
+BUMPED_MAJOR_MINOR_VERSION = null
+
+def call(options) {
+    pipeline {
+        agent any
+        stages {
+            stage('Preparation') {
+                steps {
+                    script {
+                        HELPER = load 'src/org/Helper.groovy'
+                        echo "Current commit: ${env.GIT_COMMIT}"
+                        echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+
+                        def versionString = readFile(getVersionFileFullPath())
+                        def versionArray = HELPER.parseVersionString(VERSION_FILE_BASE_NAME, versionString)
+                        def version = versionArray.join(".")
+                        echo "Detected current version: $version"
+
+                        def versionBumpMatrix = HELPER.calcVersionBumpMatrixFromChangeset()
+                        echo "Calculated version bump plan: $versionBumpMatrix"
+
+                        def bumpedVersionArray = HELPER.calculateBumpedVersion(versionArray, versionBumpMatrix)
+                        BUMPED_VERSION = bumpedVersionArray.join(".")
+                        echo "Will bump version to: $BUMPED_VERSION"
+                        BUMPED_MAJOR_VERSION = bumpedVersionArray[0] as String
+                        echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
+                        BUMPED_MAJOR_MINOR_VERSION = HELPER.formatVersionAsMajorMinorOnly(bumpedVersionArray)
+                        echo "Major+minor version after bumping: $BUMPED_MAJOR_MINOR_VERSION"
+
+                        if (options.containsKey('prepare')) {
+                            options['prepare']()
+                        }
+                    }
+                }
+            }
+        }
+        post {
+            always {
+                script {
+                    if (options.containsKey('post_always_block')) {
+                        options['post_always_block']()
+                    }
+                }
+            }
+        }
+    }
+}

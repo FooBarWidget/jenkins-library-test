@@ -13,7 +13,7 @@ pipeline {
 		stage('Preparation') {
 			steps {
 				script {
-					def HELPER = load 'src/org/Helper.groovy'
+					HELPER = load 'src/org/Helper.groovy'
 					echo "Current commit: ${env.GIT_COMMIT}"
 					echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 
