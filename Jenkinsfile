@@ -1,8 +1,7 @@
 VERSION_FILE_BASE_NAME = "version.txt"
 BUMPED_VERSION = null
 COMMIT_AFTER_BUMP = null
-
-MY_MOD = load 'foo.groovy'
+MY_MOD = null
 
 def getVersionFileFullPath() {
 	return "${env.WORKSPACE}/${VERSION_FILE_BASE_NAME}"
@@ -115,6 +114,7 @@ pipeline {
 		stage('Preparation') {
 			steps {
 				script {
+					MY_MOD = load 'foo.groovy'
 					echo "Foo = ${MY_MOD.foo()}"
 					echo "Current commit: ${env.GIT_COMMIT}"
 					echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
