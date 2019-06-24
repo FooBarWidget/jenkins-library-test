@@ -41,7 +41,7 @@ def mergeVersionBumpMatrices(matrix1, matrix2) {
 }
 
 def calcVersionBumpMatrixFromChangeset() {
-	def int[] versionBumpMatrix = [0, 0, 0]
+	def int[] versionBumpMatrix = [false, false, false]
 	forEachCommitSinceLastSuccessfulBuild() { commit ->
 		def message = sh(
 			script: "git log --format='%B' '$commit~1..$commit'",
@@ -89,9 +89,9 @@ pipeline {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 						def version = readVersion()
+						echo "Detected version: ${version}"
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
-						echo "version = ${version}"
-						echo "versionBumpMatrix = ${versionBumpMatrix}"
+						echo "Calculated version bump plan: ${versionBumpMatrix}"
 					}
 				}
 			}
