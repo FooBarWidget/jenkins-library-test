@@ -80,11 +80,6 @@ def int[] parseVersionString(versionFile, version) {
 	] as int[]
 }
 
-@NonCPS
-def String readVersionString() {
-	return readFile(getVersionFileFullPath())
-}
-
 def calculateBumpedVersion(version, versionBumpMatrix) {
 	def result = version.clone()
 	if (versionBumpMatrix[0]) {
@@ -109,7 +104,7 @@ pipeline {
 					if (getBranchName() == 'master') {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-						def versionString = readVersionString()
+						def versionString = readFile(getVersionFileFullPath())
 						echo "Detected current version string: $versionString"
 						def version = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
 						echo "Detected current version: $version"
