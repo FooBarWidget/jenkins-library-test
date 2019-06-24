@@ -1,3 +1,9 @@
+def VERSION_FILE_BASE_NAME = "version.txt"
+
+def getVersionFileFullPath() {
+	return "${env.WORKSPACE}/${VERSION_FILE_BASE_NAME}"
+}
+
 def getBranchName() {
 	def parts = env.GIT_BRANCH.split("/", 2)
 	return parts[1]
@@ -75,12 +81,8 @@ def int[] parseVersionString(versionFile, version) {
 }
 
 @NonCPS
-def int[] readVersion2() {
-	def content = readFile("${env.WORKSPACE}/version.txt").trim()
-	return parseVersionString("version.txt",
-		"5.6.7")
-	//return parseVersionString("version.txt",
-	//	readFile("${env.WORKSPACE}/version.txt").trim())
+def int[] readVersionString() {
+	return readFile(getVersionFileFullPath())
 }
 
 def calculateBumpedVersion(version, versionBumpMatrix) {
@@ -107,7 +109,8 @@ pipeline {
 					if (getBranchName() == 'master') {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-						def version = readVersion2()
+						def versionString = readVersionString()
+						def version = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
 						echo "Detected current version: $version (${version.getClass()})"
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
