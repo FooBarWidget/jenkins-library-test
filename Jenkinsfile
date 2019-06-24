@@ -41,7 +41,7 @@ def mergeVersionBumpMatrices(matrix1, matrix2) {
 }
 
 def calcVersionBumpMatrixFromChangeset() {
-	def int[] versionBumpMatrix = [false, false, false]
+	def boolean[] versionBumpMatrix = [false, false, false]
 	forEachCommitSinceLastSuccessfulBuild() { commit ->
 		def message = sh(
 			script: "git log --format='%B' '$commit~1..$commit'",
