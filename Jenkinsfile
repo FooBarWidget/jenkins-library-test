@@ -114,7 +114,7 @@ pipeline {
 		stage('Preparation') {
 			steps {
 				script {
-					MY_MOD = load 'foo.groovy'
+					MY_MOD = load 'src/org/Helper.groovy'
 					echo "Foo = ${MY_MOD.foo()}"
 					echo "Current commit: ${env.GIT_COMMIT}"
 					echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
