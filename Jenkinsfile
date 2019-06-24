@@ -117,12 +117,12 @@ pipeline {
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
 
-						def bumpedVersionArray = calculateBumpedVersion(version, versionBumpMatrix)
+						def bumpedVersionArray = calculateBumpedVersion(versionArray, versionBumpMatrix)
 						BUMPED_VERSION = bumpedVersionArray.join(".")
 						echo "Will bump version to: $BUMPED_VERSION"
-						BUMPED_MAJOR_VERSION = BUMPED_VERSION[0]
+						BUMPED_MAJOR_VERSION = bumpedVersionArray[0] as String
 						echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
-						BUMPED_MAJOR_MINOR_VERSION = formatVersionAsMajorMinorOnly(BUMPED_VERSION)
+						BUMPED_MAJOR_MINOR_VERSION = formatVersionAsMajorMinorOnly(bumpedVersionArray)
 						echo "Major+minor version after bumping: $BUMPED_MAJOR_MINOR_VERSION"
 					}
 				}
