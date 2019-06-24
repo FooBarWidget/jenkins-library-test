@@ -1,14 +1,12 @@
 import org.Helper
 
-//@groovy.transform.Field
-static final METADATA_FILE_BASE_NAME = 'metadata.rb'
+@groovy.transform.Field METADATA_FILE_BASE_NAME = 'metadata.rb'
 HELPER = null
 BUMPED_VERSION = null
 BUMPED_MAJOR_VERSION = null
 BUMPED_MAJOR_MINOR_VERSION = null
 
 def getMetadataFileFullPath() {
-    println(this.getClass())
     return "${env.WORKSPACE}/${METADATA_FILE_BASE_NAME}"
 }
 
