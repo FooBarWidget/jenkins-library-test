@@ -6,18 +6,18 @@ import org.Helper
 @groovy.transform.Field BUMPED_MAJOR_VERSION = null
 @groovy.transform.Field BUMPED_MAJOR_MINOR_VERSION = null
 
-def getMetadataFileFullPath() {
+private def getMetadataFileFullPath() {
     return "${env.WORKSPACE}/${METADATA_FILE_BASE_NAME}"
 }
 
-def extractVersionString(metadataFile) {
+private def extractVersionString(metadataFile) {
     def match = metadataFile =~ /(?m)^version ['"](.+)['"]/
     if (match) {
         return match.group(1)
     }
 }
 
-def definePipeline(options) {
+def call(options) {
     pipeline {
         agent any
         stages {
