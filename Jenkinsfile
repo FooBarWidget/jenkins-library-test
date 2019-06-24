@@ -76,8 +76,9 @@ def int[] parseVersionString(versionFile, version) {
 
 @NonCPS
 def int[] readVersion2() {
-	return parseVersionString("version.txt",
-		readFile("${env.WORKSPACE}/version.txt").trim())
+	return [5,6,7,8] as int[]
+	//return parseVersionString("version.txt",
+	//	readFile("${env.WORKSPACE}/version.txt").trim())
 }
 
 def calculateBumpedVersion(version, versionBumpMatrix) {
