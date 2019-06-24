@@ -95,6 +95,7 @@ pipeline {
 		stage('Preparation') {
 			steps {
 				script {
+					sh 'env | sort'
 					if (env.BRANCH_NAME == 'master') {
 						def version = readVersion()
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
