@@ -34,11 +34,20 @@ def forEachCommitSinceLastSuccessfulBuild(block) {
  */
 
 def boolean[] calcVersionBumpMatrixFromCommitMessage(message) {
-	if (message.matches(/^major\//)) {
+	def sourceBranchMessage = null
+
+	def match = message =~ /^Merge pull request .* from (.+?) to/
+	if (match) {
+		sourceBranchMessage = match.group(1)
+	} else {
+		sourceBranchMessage = message
+	}
+
+	if (sourceBranchMessage.matches(/(?m)^major\//)) {
 		return [true,  false, false] as boolean[]
-	} else if (message.matches(/^minor\//)) {
+	} else if (sourceBranchMessage.matches(/(?m)^minor\//)) {
 		return [false, true,  false] as boolean[]
-	} else if (message.matches(/^(tiny|patch)\//)) {
+	} else if (sourceBranchMessage.matches(/(?m)^(tiny|patch)\//)) {
 		return [false, false, true] as boolean[]
 	} else {
 		return [false, false, false] as boolean[]
