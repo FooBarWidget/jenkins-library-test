@@ -1,7 +1,7 @@
 import org.Helper
 
-@groovy.transform.Field
-def METADATA_FILE_BASE_NAME = 'metadata.rb'
+//@groovy.transform.Field
+static final METADATA_FILE_BASE_NAME = 'metadata.rb'
 HELPER = null
 BUMPED_VERSION = null
 BUMPED_MAJOR_VERSION = null
@@ -32,7 +32,7 @@ def call(options) {
 
                         def metadataFile = readFile(getMetadataFileFullPath())
                         def versionString = extractVersionString(metadataFile)
-                        def versionArray = HELPER.parseVersionString(VERSION_FILE_BASE_NAME, versionString)
+                        def versionArray = HELPER.parseVersionString(METADATA_FILE_BASE_NAME, versionString)
                         def version = versionArray.join(".")
                         echo "Detected current version: $version"
 
