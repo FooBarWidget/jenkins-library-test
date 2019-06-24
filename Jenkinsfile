@@ -2,6 +2,8 @@ VERSION_FILE_BASE_NAME = "version.txt"
 BUMPED_VERSION = null
 COMMIT_AFTER_BUMP = null
 
+MY_MOD = load 'foo.groovy'
+
 def getVersionFileFullPath() {
 	return "${env.WORKSPACE}/${VERSION_FILE_BASE_NAME}"
 }
@@ -113,61 +115,75 @@ pipeline {
 		stage('Preparation') {
 			steps {
 				script {
-					sh 'env | sort'
-					if (getBranchName() == 'master') {
-						echo "Current commit: ${env.GIT_COMMIT}"
-						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+					echo "Foo = ${MY_MOD.foo()}"
+					echo "Current commit: ${env.GIT_COMMIT}"
+					echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 
-						def versionString = readFile(getVersionFileFullPath())
-						def versionArray = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
-						def version = versionArray.join(".")
-						echo "Detected current version: $version"
+					def versionString = readFile(getVersionFileFullPath())
+					def versionArray = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
+					def version = versionArray.join(".")
+					echo "Detected current version: $version"
 
-						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
-						echo "Calculated version bump plan: $versionBumpMatrix"
+					def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
+					echo "Calculated version bump plan: $versionBumpMatrix"
 
-						def bumpedVersionArray = calculateBumpedVersion(versionArray, versionBumpMatrix)
-						BUMPED_VERSION = bumpedVersionArray.join(".")
-						echo "Will bump version to: $BUMPED_VERSION"
-						BUMPED_MAJOR_VERSION = bumpedVersionArray[0] as String
-						echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
-						BUMPED_MAJOR_MINOR_VERSION = formatVersionAsMajorMinorOnly(bumpedVersionArray)
-						echo "Major+minor version after bumping: $BUMPED_MAJOR_MINOR_VERSION"
-					}
+					def bumpedVersionArray = calculateBumpedVersion(versionArray, versionBumpMatrix)
+					BUMPED_VERSION = bumpedVersionArray.join(".")
+					echo "Will bump version to: $BUMPED_VERSION"
+					BUMPED_MAJOR_VERSION = bumpedVersionArray[0] as String
+					echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
+					BUMPED_MAJOR_MINOR_VERSION = formatVersionAsMajorMinorOnly(bumpedVersionArray)
+					echo "Major+minor version after bumping: $BUMPED_MAJOR_MINOR_VERSION"
 				}
 			}
 		}
 		stage('Bump version') {
 			steps {
 				script {
-					echo "echo '$BUMPED_VERSION' > version.txt"
-					echo "git commit -a -m 'v$BUMPED_VERSION'"
-					echo "git push"
-					echo "git tag v$BUMPED_VERSION"
-					echo "git push v$BUMPED_VERSION"
+					if (getBranchName() == 'master') {
+						echo "echo '$BUMPED_VERSION' > version.txt"
+						echo "git commit -a -m 'v$BUMPED_VERSION'"
+						echo "git push"
+						echo "git tag v$BUMPED_VERSION"
+						echo "git push origin v$BUMPED_VERSION"
 
-					COMMIT_AFTER_BUMP = sh(
-						script: "git log --format='%H' HEAD~1..HEAD",
-						returnStdout: true
-					).trim()
-					echo "Commit after version bumping: $COMMIT_AFTER_BUMP"
+						COMMIT_AFTER_BUMP = sh(
+							script: "git log --format='%H' HEAD~1..HEAD",
+							returnStdout: true
+						).trim()
+						echo "Commit after version bumping: $COMMIT_AFTER_BUMP"
+					} else {
+						echo 'Skipping bumping version because we are not on master branch.'
+					}
 				}
 			}
 		}
 		stage('Update major branch') {
 			steps {
-				echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_VERSION ]; then git branch v$BUMPED_MAJOR_VERSION; fi"
-				echo "git checkout v$BUMPED_MAJOR_VERSION"
-				echo "git reset --hard $COMMIT_AFTER_BUMP"
-				echo "git push origin v$BUMPED_MAJOR_VERSION"
+				script {
+					if (getBranchName() == 'master') {
+						echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_VERSION ]; then git branch v$BUMPED_MAJOR_VERSION; fi"
+						echo "git checkout v$BUMPED_MAJOR_VERSION"
+						echo "git reset --hard $COMMIT_AFTER_BUMP"
+						echo "git push origin v$BUMPED_MAJOR_VERSION"
+					} else {
+						echo 'Skipping updating major branch because we are not on master branch.'
+					}
+				}
 			}
 		}
 		stage('Update major+minor branch') {
 			steps {
-				echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_MINOR_VERSION ]; then git branch v$BUMPED_MAJOR_MINOR_VERSION; fi"
-				echo "git checkout v$BUMPED_MAJOR_MINOR_VERSION"
-				echo "git reset --hard $COMMIT_AFTER_BUMP"
-				echo "git push origin v$BUMPED_MAJOR_MINOR_VERSION"
+				script {
+					if (getBranchName() == 'master') {
+						echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_MINOR_VERSION ]; then git branch v$BUMPED_MAJOR_MINOR_VERSION; fi"
+						echo "git checkout v$BUMPED_MAJOR_MINOR_VERSION"
+						echo "git reset --hard $COMMIT_AFTER_BUMP"
+						echo "git push origin v$BUMPED_MAJOR_MINOR_VERSION"
+					} else {
+						echo 'Skipping updating major+minor branch because we are not on master branch.'
+					}
+				}
 			}
 		}
 	}
