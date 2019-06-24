@@ -39,7 +39,7 @@ pipeline {
 			steps {
 				script {
 					if (HELPER.getBranchName() == 'master') {
-						echo "echo '$BUMPED_VERSION' > version.txt"
+						echo "echo '$BUMPED_VERSION' > ${getVersionFileFullPath()}"
 						echo "git commit -a -m 'v$BUMPED_VERSION'"
 						echo "git push"
 						echo "git tag v$BUMPED_VERSION"
