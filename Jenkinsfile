@@ -96,7 +96,7 @@ pipeline {
 			steps {
 				script {
 					sh 'env | sort'
-					if (env.BRANCH_NAME == 'master') {
+					if (env.GIT_BRANCH == 'master') {
 						def version = readVersion()
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "version = ${version}"
