@@ -53,10 +53,10 @@ def calcVersionBumpMatrixFromChangeset() {
 			returnStdout: true
 		)
 		def thisVersionBumpMatrix = calcVersionBumpMatrixFromCommitMessage(message)
-		echo 'thisVersionBumpMatrix = ${thisVersionBumpMatrix}'
+		echo "thisVersionBumpMatrix = ${thisVersionBumpMatrix}"
 		versionBumpMatrix = mergeVersionBumpMatrices(versionBumpMatrix,
 			thisVersionBumpMatrix)
-		echo 'afterwards: ${versionBumpMatrix}'
+		echo "afterwards: ${versionBumpMatrix}"
 	}
 	return versionBumpMatrix
 }
