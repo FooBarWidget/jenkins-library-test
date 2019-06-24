@@ -76,6 +76,7 @@ def int[] parseVersionString(versionFile, version) {
 
 @NonCPS
 def int[] readVersion2() {
+	def content = readFile("${env.WORKSPACE}/version.txt").trim()
 	return parseVersionString("version.txt",
 		"5.6.7")
 	//return parseVersionString("version.txt",
