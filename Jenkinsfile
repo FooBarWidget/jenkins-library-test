@@ -1,4 +1,4 @@
-VERSION_FILE_BASE_NAME = "version.txt"
+final VERSION_FILE_BASE_NAME = "version.txt"
 HELPER = null
 BUMPED_VERSION = null
 COMMIT_AFTER_BUMP = null

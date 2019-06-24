@@ -1,17 +1,17 @@
 import org.Helper
 
-@groovy.transform.Field METADATA_FILE_BASE_NAME = 'metadata.rb'
-HELPER = null
-BUMPED_VERSION = null
-BUMPED_MAJOR_VERSION = null
-BUMPED_MAJOR_MINOR_VERSION = null
+@groovy.transform.Field final METADATA_FILE_BASE_NAME = 'metadata.rb'
+@groovy.transform.Field HELPER = null
+@groovy.transform.Field BUMPED_VERSION = null
+@groovy.transform.Field BUMPED_MAJOR_VERSION = null
+@groovy.transform.Field BUMPED_MAJOR_MINOR_VERSION = null
 
 def getMetadataFileFullPath() {
     return "${env.WORKSPACE}/${METADATA_FILE_BASE_NAME}"
 }
 
 def extractVersionString(metadataFile) {
-    def match = metadataFile =~ /(?m)^metadata ['"](.+)['"]/
+    def match = metadataFile =~ /(?m)^version ['"](.+)['"]/
     if (match) {
         return match.group(1)
     }
