@@ -110,13 +110,15 @@ pipeline {
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 
 						def versionString = readFile(getVersionFileFullPath())
-						def version = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
+						def versionArray = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
+						def version = versionArray.join(".")
 						echo "Detected current version: $version"
 
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
 
-						BUMPED_VERSION = calculateBumpedVersion(version, versionBumpMatrix)
+						def bumpedVersionArray = calculateBumpedVersion(version, versionBumpMatrix)
+						BUMPED_VERSION = bumpedVersionArray.join(".")
 						echo "Will bump version to: $BUMPED_VERSION"
 						BUMPED_MAJOR_VERSION = BUMPED_VERSION[0]
 						echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
