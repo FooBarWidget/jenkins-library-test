@@ -3,6 +3,7 @@ def commitHashForBuild(build) {
 	return scmAction?.revision?.hash
 }
 
+@NonCPS
 def getLastSuccessfulCommit() {
 	def lastSuccessfulHash = null
 	def lastSuccessfulBuild = currentBuild.rawBuild.getPreviousSuccessfulBuild()
