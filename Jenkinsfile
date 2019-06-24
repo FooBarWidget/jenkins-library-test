@@ -1,4 +1,6 @@
 VERSION_FILE_BASE_NAME = "version.txt"
+BUMPED_VERSION = null
+COMMIT_AFTER_BUMP = null
 
 def getVersionFileFullPath() {
 	return "${env.WORKSPACE}/${VERSION_FILE_BASE_NAME}"
@@ -59,10 +61,8 @@ def calcVersionBumpMatrixFromChangeset() {
 			returnStdout: true
 		)
 		def thisVersionBumpMatrix = calcVersionBumpMatrixFromCommitMessage(message)
-		echo "thisVersionBumpMatrix = ${thisVersionBumpMatrix}"
 		versionBumpMatrix = mergeVersionBumpMatrices(versionBumpMatrix,
 			thisVersionBumpMatrix)
-		echo "afterwards: ${versionBumpMatrix}"
 	}
 	return versionBumpMatrix
 }
@@ -94,6 +94,10 @@ def calculateBumpedVersion(version, versionBumpMatrix) {
 	return result
 }
 
+def formatVersionAsMajorMinorOnly(version) {
+	return "${version[0]}.${version[1]}"
+}
+
 pipeline {
 	agent any
 	stages {
@@ -104,16 +108,55 @@ pipeline {
 					if (getBranchName() == 'master') {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+
 						def versionString = readFile(getVersionFileFullPath())
-						echo "Detected current version string: $versionString"
 						def version = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
 						echo "Detected current version: $version"
+
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
-						def bumpedVersion = calculateBumpedVersion(version, versionBumpMatrix)
-						echo "Will bump version to: $bumpedVersion"
+
+						BUMPED_VERSION = calculateBumpedVersion(version, versionBumpMatrix)
+						echo "Will bump version to: $BUMPED_VERSION"
+						BUMPED_MAJOR_VERSION = BUMPED_VERSION[0]
+						echo "Major version after bumping: $BUMPED_MAJOR_VERSION"
+						BUMPED_MAJOR_MINOR_VERSION = formatVersionAsMajorMinorOnly(BUMPED_VERSION)
+						echo "Major+minor version after bumping: $BUMPED_MAJOR_MINOR_VERSION"
 					}
 				}
+			}
+		}
+		stage('Bump version') {
+			steps {
+				script {
+					echo "echo '$BUMPED_VERSION' > version.txt"
+					echo "git commit -a -m 'v$BUMPED_VERSION'"
+					echo "git push"
+					echo "git tag v$BUMPED_VERSION"
+					echo "git push v$BUMPED_VERSION"
+
+					COMMIT_AFTER_BUMP = sh(
+						script: "git log --format='%H' HEAD~1..HEAD",
+						returnStdout: true
+					).trim()
+					echo "Commit after version bumping: $COMMIT_AFTER_BUMP"
+				}
+			}
+		}
+		stage('Update major branch') {
+			steps {
+				echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_VERSION ]; then git branch v$BUMPED_MAJOR_VERSION; fi"
+				echo "git checkout v$BUMPED_MAJOR_VERSION"
+				echo "git reset --hard $COMMIT_AFTER_BUMP"
+				echo "git push origin v$BUMPED_MAJOR_VERSION"
+			}
+		}
+		stage('Update major+minor branch') {
+			steps {
+				echo "if ! [ -f .git/refs/heads/v$BUMPED_MAJOR_MINOR_VERSION ]; then git branch v$BUMPED_MAJOR_MINOR_VERSION; fi"
+				echo "git checkout v$BUMPED_MAJOR_MINOR_VERSION"
+				echo "git reset --hard $COMMIT_AFTER_BUMP"
+				echo "git push origin v$BUMPED_MAJOR_MINOR_VERSION"
 			}
 		}
 	}
