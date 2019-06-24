@@ -73,9 +73,9 @@ def call(options) {
                         }
 
                         def tests = [
-                            foodcritic: {
+                            : /*foodcritic: {
                                 shRubyCommand 'foodcritic .'
-                            }
+                            } */
                         ]
 
                         if (fileExists('spec')) {
