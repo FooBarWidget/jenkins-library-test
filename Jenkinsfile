@@ -75,7 +75,7 @@ def parseVersionString(versionFile, version) {
 }
 
 @NonCPS
-def int[] readVersion() {
+def int[] readVersion2() {
 	return parseVersionString("version.txt",
 		readFile("${env.WORKSPACE}/version.txt").trim())
 }
@@ -104,7 +104,7 @@ pipeline {
 					if (getBranchName() == 'master') {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-						def version = readVersion()
+						def version = readVersion2()
 						echo "Detected current version: $version (${version.getClass()})"
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
