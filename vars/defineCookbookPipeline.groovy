@@ -7,7 +7,7 @@ BUMPED_MAJOR_VERSION = null
 BUMPED_MAJOR_MINOR_VERSION = null
 
 def getMetadataFileFullPath() {
-    return "${env.WORKSPACE}/${METADATA_FILE_BASE_NAME}"
+    return "${env.WORKSPACE}/${this.METADATA_FILE_BASE_NAME}"
 }
 
 def extractVersionString(metadataFile) {
