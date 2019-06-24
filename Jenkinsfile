@@ -110,8 +110,9 @@ pipeline {
 						echo "Current commit: ${env.GIT_COMMIT}"
 						echo "Previous successful commit: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
 						def versionString = readVersionString()
+						echo "Detected current version string: $versionString"
 						def version = parseVersionString(VERSION_FILE_BASE_NAME, versionString)
-						echo "Detected current version: $version (${version.getClass()})"
+						echo "Detected current version: $version"
 						def versionBumpMatrix = calcVersionBumpMatrixFromChangeset()
 						echo "Calculated version bump plan: $versionBumpMatrix"
 						def bumpedVersion = calculateBumpedVersion(version, versionBumpMatrix)
